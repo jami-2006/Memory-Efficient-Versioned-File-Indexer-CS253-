@@ -1,26 +1,81 @@
-# CS253 Course Project: Memory Efficient Versioned File Indexer
+# CS253 Assignment 1 - Memory Efficient Versioned File Indexer
 
-This repository contains my course project for **CS253 (Software Development & Operations)**. The goal of the project was to build a versioned file indexing system in C++ that can operate under extremely tight memory constraints (specifically a strict **256–1024 KB** fixed-size memory buffer).
+Name: Jashan
+Roll Number: 240488
+Submission Date: March 6, 2026
 
----
 
-## What It Does
+## What this program does
 
-The indexer reads massive text files in small chunks, builds a per-version word-frequency index without blowing up the heap, and answers specific analytical queries:
+This program reads a large text file and counts how many times each word appears.
+It does this without loading the whole file into memory. Instead it reads the file
+in small chunks(256-1024KB buffers) using a fixed size buffer. After building the word count it can
+answer three types of queries in a memory efficient way.
 
-* **Word count** across different file versions.
-* **Top-K** most frequent words.
-* **Version difference comparisons** (diff queries).
 
----
+## How to compile
 
-## Technical Details
+g++ -std=c++17 -O2 -o analyzer 240488_Jashan.cpp
 
-I structured the codebase using proper object-oriented principles. You'll find heavy use of **inheritance**, **runtime polymorphism**, and **C++ templates** in the source code to keep things clean and reusable. I also added proper **exception handling** to make sure the program doesn't crash if it hits a bad query or a corrupted file chunk.
 
----
+## How to run
 
-## Repository Structure
+Word query - find how many times a word appears:
 
-* `src/VersionedFileIndexer.cpp`: The core C++ source code.
-* `docs/Project_Report.pdf`: The final report detailing the memory management strategies, data structures used, and benchmarking results.
+./analyzer.exe --file dataset_v1.txt --version v1 --buffer 512 --query word --word error
+
+Top K query - find the most frequent words:
+
+./analyzer.exe --file dataset_v1.txt --version v1 --buffer 512 --query top --top 10
+
+Diff query - compare a word between two files:
+
+./analyzer.exe --file1 dataset_v1.txt --version1 v1 --file2 dataset_v2.txt --version2 v2 --buffer 512 --query diff --word error
+
+Note: If you are using linux instead of windows replace ".analyzer.exe" with ".analyzer"
+
+
+## Arguments
+
+--file        path to input file
+--file1       path to first file, used in diff query
+--file2       path to second file, used in diff query
+--version     name for the version
+--version1    name for first version, used in diff query
+--version2    name for second version, used in diff query
+--buffer      buffer size in KB, must be between 256 and 1024
+--query       type of query: word, top, or diff
+--word        the word to search for
+--top         how many top words to show
+
+
+## Classes
+
+BufferedReader - reads the file one chunk at a time using a fixed buffer.
+Memory stays constant no matter how large the file is.
+
+Tokenizer - extracts words from raw bytes and converts them to lowercase.
+Handles words that are split across two buffer chunks using a leftover string.
+
+VersionIndex - stores the word frequency map for one version of a file.
+
+QueryProcessor - runs the full pipeline. builds the index and runs the query.
+
+Query - abstract base class. WordQuery, TopKQuery, and DiffQuery inherit from it.
+
+
+## C++ features used
+
+- Abstract base class and inheritance
+- Runtime polymorphism using virtual functions
+- Function overloading
+- Function template
+- Exception handling using try catch throw
+
+
+## Files submitted
+
+240488_Jashan.cpp
+240488_Jashan.md
+240488_Jashan.pdf
+240488_Jashan.jpg(screenshots)
